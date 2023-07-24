@@ -1,8 +1,5 @@
-let nombreIngresado   = "ema"
-
-if( ((nombreIngresado !="") && (nombreIngresado == "EMA")) || (nombreIngresado =="ema") ){
-    
-    console.log("Hola "+ nombreIngresado); 
+if(!false){
+    console.log("Es verdadero");
 }else{
-    console.log("Error: Este nombre no tiene acceso a la aplicación.");
+    console.log("Es falso")
 }
