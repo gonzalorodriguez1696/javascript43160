@@ -233,7 +233,6 @@ carrito.levantarStorage()
 carrito.mostrarProductos()
 carrito.eventoFinalizarCompra()
 
-
 //Instancia de ProductoController - Gestiona todos los productos, es decir: mostrar, calcularTotal
 const controlador_productos = new ProductoController()
 controlador_productos.cargarProductos()
