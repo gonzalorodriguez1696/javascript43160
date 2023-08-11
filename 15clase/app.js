@@ -1,6 +1,6 @@
 class Producto {
-    
-    constructor({id, nombre, precio, descripcion, img}){
+
+    constructor({ id, nombre, precio, descripcion, img }) {
         this.id = id
         this.nombre = nombre
         this.precio = precio
@@ -9,12 +9,12 @@ class Producto {
         this.img = img
     }
 
-    aumentarCantidad(){
+    aumentarCantidad() {
         this.cantidad++
     }
 
-    disminuirCantidad(){
-        if(this.cantidad > 1){
+    disminuirCantidad() {
+        if (this.cantidad > 1) {
             this.cantidad--
             return true
         }
@@ -22,7 +22,7 @@ class Producto {
         return false
     }
 
-    descripcionHTMLCarrito(){
+    descripcionHTMLCarrito() {
         return `
         <div class="card mb-3" style="max-width: 540px;">
             <div class="row g-0">
@@ -41,7 +41,7 @@ class Producto {
         </div>`
     }
 
-    descripcionHTML(){
+    descripcionHTML() {
         return `<div class="card" style="width: 18rem;">
         <img src="${this.img}" class="card-img-top" alt="...">
         <div class="card-body">
@@ -64,11 +64,11 @@ class Carrito {
         this.keyStorage = "listaCarrito"
     }
 
-    levantarStorage(){
+    levantarStorage() {
         //this.listaCarrito = JSON.parse(localStorage.getItem("listaCarrito")) || []
         this.listaCarrito = JSON.parse(localStorage.getItem(this.keyStorage)) || []
 
-        if(this.listaCarrito.length > 0){
+        if (this.listaCarrito.length > 0) {
             let listaAuxiliar = []
 
             for (let i = 0; i < this.listaCarrito.length; i++) {
@@ -77,7 +77,7 @@ class Carrito {
                 listaAuxiliar.push(productoDeLaClaseProducto)
                 //id, nombre, precio, descripcion, img
                 //const element2 = new Producto(this.listaCarrito[i].id, this.listaCarrito[i].nombre, this.listaCarrito[i].precio, this.listaCarrito[i].descripcion, this.listaCarrito[i].img )
-                
+
             }
 
             this.listaCarrito = listaAuxiliar
@@ -92,7 +92,7 @@ class Carrito {
         */
     }
 
-    guardarEnStorage(){
+    guardarEnStorage() {
         let listaCarritoJSON = JSON.stringify(this.listaCarrito)
         //localStorage.setItem("listaCarrito", listaCarritoJSON)
         localStorage.setItem(this.keyStorage, listaCarritoJSON)
@@ -101,35 +101,35 @@ class Carrito {
     agregar(productoAgregar) {
         //this.listaCarrito.push(productoAgregar)
         let existeElProducto = this.listaCarrito.some(producto => producto.id == productoAgregar.id)
-        
-        if( existeElProducto ){
+
+        if (existeElProducto) {
             let producto = this.listaCarrito.find(producto => producto.id == productoAgregar.id)
             producto.cantidad = producto.cantidad + 1
-        }else{
+        } else {
             this.listaCarrito.push(productoAgregar)
         }
     }
 
-    eliminar(productoEliminar){
+    eliminar(productoEliminar) {
         let producto = this.listaCarrito.find(producto => producto.id == productoEliminar.id)
         let indice = this.listaCarrito.indexOf(producto)
-        this.listaCarrito.splice(indice,1)
+        this.listaCarrito.splice(indice, 1)
     }
 
-    limpiarContenedorCarrito(){
+    limpiarContenedorCarrito() {
         this.contenedor_carrito.innerHTML = ""
     }
 
     mostrarProductos() {
         this.limpiarContenedorCarrito()
 
-        this.listaCarrito.forEach( producto => {
+        this.listaCarrito.forEach(producto => {
             contenedor_carrito.innerHTML += producto.descripcionHTMLCarrito()
         })
 
         //damos evento al botón "Eliminar producto del carrito"
         this.listaCarrito.forEach(producto => {
-            
+
             let btn_eliminar = document.getElementById(`eliminar-${producto.id}`)
             let btn_plus = document.getElementById(`plus-${producto.id}`)
             let btn_minus = document.getElementById(`minus-${producto.id}`)
@@ -140,30 +140,30 @@ class Carrito {
                 this.mostrarProductos()
             })
 
-            btn_plus.addEventListener("click",()=>{
+            btn_plus.addEventListener("click", () => {
                 producto.aumentarCantidad()
                 this.mostrarProductos()
             })
 
-            btn_minus.addEventListener("click", ()=>{
-                if( producto.disminuirCantidad() ){
+            btn_minus.addEventListener("click", () => {
+                if (producto.disminuirCantidad()) {
                     this.mostrarProductos()
                 }
             })
 
         })
-        
+
         total.innerHTML = "Precio Total: $" + this.calcular_total()
     }
 
-    calcular_total(){
-        return this.listaCarrito.reduce((acumulador, producto) => acumulador + producto.precio * producto.cantidad ,0)
+    calcular_total() {
+        return this.listaCarrito.reduce((acumulador, producto) => acumulador + producto.precio * producto.cantidad, 0)
     }
 
-    eventoFinalizarCompra(){
-        this.finalizar_compra.addEventListener("click", ()=> {
-            
-            if(this.listaCarrito.length > 0){
+    eventoFinalizarCompra() {
+        this.finalizar_compra.addEventListener("click", () => {
+
+            if (this.listaCarrito.length > 0) {
                 let precio_total = this.calcular_total()
                 //limpiar el carrito
                 this.listaCarrito = []
@@ -171,12 +171,22 @@ class Carrito {
                 localStorage.removeItem(this.keyStorage)
                 //total
                 this.limpiarContenedorCarrito()
-                
-                //renderizar el carrito con el msj 'Compra realizada con éxito'
-                this.contenedor_carrito.innerHTML = '<h3 class="text-center">Compra realizada con éxito!</h3>'
-                this.total.innerText = 'Por el precio total de: $'+precio_total
-            }else{
-                this.contenedor_carrito.innerHTML = '<h3 class="text-center">¡No hay productos para finalizar la compra!</h3>'
+                this.total.innerHTML = ""
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: `¡La compra se registró con éxito por un total de:  $${precio_total}`,
+                    text: "Para más detalle, revise su e-mail",
+                    timer: 3000
+                  })
+
+            } else {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'warning',
+                    title: '¡Debes añadir productos para realizar la compra!',
+                    timer: 3000
+                  })
             }
         })
     }
@@ -187,14 +197,14 @@ class ProductoController {
         this.listaProductos = []
     }
 
-    cargarProductos(){
+    cargarProductos() {
         //Instancias de Producto
-        const p1 = new Producto({id:1, nombre:"ryzen 3", precio:100000, descripcion:"un producto de gama baja", img:"https://img.xentra.com.mx/xentra_jbsystem/img/productos/YD3200C5FHBOX/YD3200C5FHBOX_842_31_07_21_06_39.webp"})
-        const p2 = new Producto({id:2, nombre:"ryzen 5", precio:150000, descripcion:"un producto de gama media", img:"https://m.media-amazon.com/images/I/51f2hkWjTlL.__AC_SX300_SY300_QL70_ML2_.jpg"})
+        const p1 = new Producto({ id: 1, nombre: "ryzen 3", precio: 100000, descripcion: "un producto de gama baja", img: "https://img.xentra.com.mx/xentra_jbsystem/img/productos/YD3200C5FHBOX/YD3200C5FHBOX_842_31_07_21_06_39.webp" })
+        const p2 = new Producto({ id: 2, nombre: "ryzen 5", precio: 150000, descripcion: "un producto de gama media", img: "https://m.media-amazon.com/images/I/51f2hkWjTlL.__AC_SX300_SY300_QL70_ML2_.jpg" })
         //const p2 = new Producto(2, "ryzen 5", 150000, "un producto de gama media", "https://m.media-amazon.com/images/I/51f2hkWjTlL.__AC_SX300_SY300_QL70_ML2_.jpg")
-        const p3 = new Producto({id:3, nombre:"ryzen 7", precio:300000, descripcion:"un producto de gama alta", img:"https://m.media-amazon.com/images/I/51D3DrDmwkL.__AC_SX300_SY300_QL70_ML2_.jpg"})
+        const p3 = new Producto({ id: 3, nombre: "ryzen 7", precio: 300000, descripcion: "un producto de gama alta", img: "https://m.media-amazon.com/images/I/51D3DrDmwkL.__AC_SX300_SY300_QL70_ML2_.jpg" })
         //const p3 = new Producto(3, "ryzen 7", 300000, "un producto de gama alta", "https://m.media-amazon.com/images/I/51D3DrDmwkL.__AC_SX300_SY300_QL70_ML2_.jpg")
-        const p4 = new Producto({id:4, nombre:"ryzen 9", precio:500000, descripcion:"un producto de gama alta", img:"https://m.media-amazon.com/images/I/616VM20+AzL._AC_SX300_SY300_.jpg"})
+        const p4 = new Producto({ id: 4, nombre: "ryzen 9", precio: 500000, descripcion: "un producto de gama alta", img: "https://m.media-amazon.com/images/I/616VM20+AzL._AC_SX300_SY300_.jpg" })
         //const p4 = new Producto(4, "ryzen 9", 500000, "un producto de gama alta", "https://m.media-amazon.com/images/I/616VM20+AzL._AC_SX300_SY300_.jpg")
 
         this.agregar(p1)
@@ -222,6 +232,14 @@ class ProductoController {
                 carrito.agregar(producto)
                 carrito.guardarEnStorage()
                 carrito.mostrarProductos()
+                Toastify({
+                    avatar: `${producto.img}`,
+                    text: `¡${producto.nombre} añadido!`,
+                    duration: 100000,
+                    gravity: "bottom", // `top` or `bottom`
+                    position: "right", // `left`, `center` or `right`
+                    
+                  }).showToast();
             })
         })
     }
